@@ -1,7 +1,10 @@
-const Vehicle = () => {
+import { Starship } from "types/types";
+
+const Vehicle = (starship: Starship) => {
   return (
     <>
-      <p>Vehicle</p>
+      <h1>{starship.name}</h1>
+      <p>{starship.cargo_capacity}</p>
     </>
   );
 };
