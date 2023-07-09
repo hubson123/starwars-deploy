@@ -1,21 +1,29 @@
 import { getStarships } from "api/apiCalls";
-import Vehicle from "components/Vehicle/Vehicle";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { PulseLoader } from "react-spinners";
-import { StyledCard, StyledWrapper } from "styled-components/General";
+import { useRecoilState, atom } from "recoil";
+
 import { Starship } from "types/types";
+
+import { StyledCard, StyledWrapper } from "styled-components/General";
+
+export const starshipsState = atom({
+  key: "starships",
+  default: [] as Starship[],
+});
 
 const VehicleList = () => {
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
-  const [data, setData] = useState<Starship[]>([]);
+  const [vehicles, setVehicles] = useRecoilState<Starship[]>(starshipsState);
   const [page, setPage] = useState(1);
+  const [pageVisitedTable, setPageVisitedTable] = useState([1]);
 
   useEffect(() => {
     fetchData();
-  }, [page]);
+  }, [pageVisitedTable]);
 
   const fetchData = () => {
     getStarships(page)
@@ -23,15 +31,20 @@ const VehicleList = () => {
       .then((data) => {
         setLoading(false);
         setPageCount(data.count / 10);
-        setData(data.results);
+        setVehicles(vehicles.concat(data.results));
       })
       .catch((error) => console.error("Error during fetching.", error));
   };
 
   const handlePageChange = (selectedItem: any) => {
-    console.log(selectedItem, ": opcje");
-    setPage(selectedItem.selected + 1);
-    console.log("strona: ", page);
+    const helper = selectedItem.selected + 1;
+    console.log("Tablica: ", vehicles);
+    if (pageVisitedTable.find((pageVisited) => pageVisited == helper)) {
+      setPage(helper);
+    } else {
+      setPage(helper);
+      setPageVisitedTable([...pageVisitedTable, helper]);
+    }
   };
 
   return (
@@ -42,8 +55,8 @@ const VehicleList = () => {
         <PulseLoader color="#36d7b7" />
       ) : (
         <StyledWrapper>
-          {data.map((vehicle: Starship, key: number) => (
-            <StyledCard>
+          {vehicles.map((vehicle: Starship, key: number) => (
+            <StyledCard key={key}>
               <p>{vehicle.name}</p>
               <Link href={`/vehicleList/${key}`}>Details</Link>
             </StyledCard>

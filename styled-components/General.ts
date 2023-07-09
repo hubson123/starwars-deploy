@@ -20,4 +20,5 @@ export const StyledCard = styled.div`
   max-width: 40rem;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
 `;
