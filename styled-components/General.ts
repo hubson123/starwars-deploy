@@ -22,3 +22,7 @@ export const StyledCard = styled.div`
   justify-content: center;
   margin: 0 auto;
 `;
+export const StyledImg = styled.img`
+  border-radius: 50%;
+  border: 2px solid yellow;
+`;
