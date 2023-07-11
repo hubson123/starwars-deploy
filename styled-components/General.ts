@@ -1,7 +1,7 @@
 import { styled } from "styled-components";
 
 export const StyledWrapper = styled.div`
-  width: 50rem;
+  max-width: 50rem;
   height: auto;
   display: flex;
   flex-wrap: wrap;
@@ -25,4 +25,15 @@ export const StyledCard = styled.div`
 export const StyledImg = styled.img`
   border-radius: 50%;
   border: 2px solid yellow;
+`;
+export const FilterSection = styled(StyledCard)`
+  flex-direction: column;
+  gap: 5px;
+  > * {
+    height: 40px;
+    width: 200px;
+  }
+  h2 {
+    margin: 0;
+  }
 `;
