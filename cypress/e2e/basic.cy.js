@@ -3,10 +3,10 @@ describe("sample test", () => {
     cy.visit("/");
   });
 
-  it("displays the resources text", () => {
-    cy.get("h1").contains("Welcome to my app!");
+  it("displays the link text", () => {
+    cy.get("a").contains("Go to Vehicle List Page!");
   });
-  it("renders the Netlify logo image", () => {
+  it("renders the Star Wars image", () => {
     cy.get("img")
       .should("be.visible")
       .and(($img) => {
