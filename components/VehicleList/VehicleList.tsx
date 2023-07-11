@@ -1,67 +1,174 @@
-import { getStarships } from "api/apiCalls";
-import Vehicle from "components/Vehicle/Vehicle";
+import { getFilms, getStarships } from "api/apiCalls";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Select from "react-select";
 import ReactPaginate from "react-paginate";
 import { PulseLoader } from "react-spinners";
-import { StyledCard, StyledWrapper } from "styled-components/General";
-import { Starship } from "types/types";
+import { useRecoilState, atom, selector, useRecoilValue } from "recoil";
+
+import { Film, Starship } from "types/types";
+
+import {
+  FilterSection,
+  StyledCard,
+  StyledWrapper,
+} from "styled-components/General";
+
+export const starshipsState = atom({
+  key: "starships",
+  default: [] as Starship[],
+});
+const starshipsCountState = selector({
+  key: "charCountState", // unique ID (with respect to other atoms/selectors)
+  get: ({ get }) => {
+    const count = get(starshipsState);
+
+    return count.length;
+  },
+});
+const filmsState = atom({
+  key: "films",
+  default: [] as Film[],
+});
 
 const VehicleList = () => {
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
-  const [data, setData] = useState<Starship[]>([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [selectInput, setSelectInput] = useState("");
+  const [vehicles, setVehicles] = useRecoilState<Starship[]>(starshipsState);
+  const [films, setFilms] = useRecoilState<Film[]>(filmsState);
+  const count = useRecoilValue(starshipsCountState);
   const [page, setPage] = useState(1);
+  const [options, setOptions] = useState([]);
+  const [pageNavigation, setPageNavigation] = useState(1);
 
   useEffect(() => {
-    fetchData();
+    if (count < 1) {
+      fetchFilmsData();
+      fetchStarshipsData();
+    } else {
+      setLoading(false);
+      let amount = Number((count / 10).toFixed(0));
+      setPageCount(amount);
+      setPage(amount + 1);
+    }
+  }, []);
+  useEffect(() => {
+    if (pageCount > 1) {
+      if (page <= pageCount) {
+        setLoading(true);
+        fetchStarshipsData();
+      }
+    }
   }, [page]);
 
-  const fetchData = () => {
+  const fetchStarshipsData = () => {
     getStarships(page)
       .then((response) => response.json())
       .then((data) => {
-        setLoading(false);
-        setPageCount(data.count / 10);
-        setData(data.results);
+        let amount = Number((data.count / 10).toFixed(0));
+        if (pageCount !== amount) {
+          setPageCount(amount);
+        }
+        if (page !== pageCount) {
+          setPage(page + 1);
+        } else {
+          setLoading(false);
+        }
+        setVehicles(vehicles.concat(data.results));
       })
-      .catch((error) => console.error("Error during fetching.", error));
+      .catch((error) =>
+        console.error("Error during fetching starships.", error),
+      );
+  };
+  const fetchFilmsData = () => {
+    getFilms()
+      .then((response) => response.json())
+      .then((data) => {
+        setFilms(data.results);
+      })
+      .catch((error) => console.error("Error during fetching films.", error));
   };
 
   const handlePageChange = (selectedItem: any) => {
-    console.log(selectedItem, ": opcje");
-    setPage(selectedItem.selected + 1);
-    console.log("strona: ", page);
+    const helper = selectedItem.selected * 10;
+    console.log("Tablica: ", helper);
+    setPageNavigation(helper);
   };
-
+  useEffect(() => {
+    console.log();
+    setOptions(
+      films.map((film: Film, key: number) => ({
+        value: film.url,
+        label: film.title,
+        key: key,
+      })),
+    );
+  }, [films]);
+  const handleSearchChange = (e) => {
+    e.preventDefault();
+    setSearchInput(e.target.value);
+  };
+  const handleSelectChange = (e) => {
+    setSelectInput(e.value);
+  };
   return (
     <>
       <h1>Vehicle List: </h1>
 
       {loading ? (
-        <PulseLoader color="#36d7b7" />
+        <>
+          <h2>Waiting until all ships are ready for war....</h2>
+          <PulseLoader color="#36d7b7" />
+        </>
       ) : (
-        <StyledWrapper>
-          {data.map((vehicle: Starship, key: number) => (
-            <StyledCard>
-              <p>{vehicle.name}</p>
-              <Link href={`/vehicleList/${key}`}>Details</Link>
-            </StyledCard>
-          ))}
+        <>
+          <FilterSection>
+            <h2>Filters: </h2>
+            <Select
+              placeholder="Select a film..."
+              options={options}
+              onChange={handleSelectChange}
+            />
+            <input
+              type="search"
+              placeholder="Search by name of vehicle..."
+              onChange={handleSearchChange}
+              value={searchInput}
+            />
+          </FilterSection>
+          <StyledWrapper>
+            {vehicles
+              .filter((vehicle: Starship) => vehicle.name.match(searchInput))
+              .filter((vehicle: Starship) =>
+                vehicle.films.includes(selectInput),
+              )
+              .map(
+                (vehicle: Starship, key: number) =>
+                  key >= pageNavigation &&
+                  key < pageNavigation + 10 && (
+                    <StyledCard key={key}>
+                      <p>{vehicle.name}</p>
+                      <Link href={`/vehicleList/${key}`}>Details</Link>
+                    </StyledCard>
+                  ),
+              )}
 
-          <ReactPaginate
-            pageCount={pageCount}
-            marginPagesDisplayed={4}
-            onPageChange={handlePageChange}
-            containerClassName={"container"}
-            previousLinkClassName={"page"}
-            breakClassName={"page"}
-            nextLinkClassName={"page"}
-            pageClassName={"page"}
-            disabledClassName={"disabled"}
-            activeClassName={"active"}
-          />
-        </StyledWrapper>
+            <ReactPaginate
+              pageCount={pageCount}
+              marginPagesDisplayed={4}
+              onPageChange={handlePageChange}
+              containerClassName={"container"}
+              previousLinkClassName={"page"}
+              breakClassName={"page"}
+              nextLinkClassName={"page"}
+              pageClassName={"page"}
+              disabledClassName={"disabled"}
+              activeClassName={"active"}
+            />
+          </StyledWrapper>
+        </>
       )}
     </>
   );

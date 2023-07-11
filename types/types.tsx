@@ -12,4 +12,12 @@ export interface Starship {
   name: string;
   passengers: string;
   starship_class: string;
+  films: string[];
+}
+export interface Film {
+  title: string;
+  release_date: string;
+  director: string;
+  episode_id: number;
+  url: string;
 }
