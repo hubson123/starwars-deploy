@@ -29,6 +29,7 @@ export const StyledImg = styled.img`
 export const FilterSection = styled(StyledCard)`
   flex-direction: column;
   gap: 5px;
+  margin-bottom: 10px;
   > * {
     height: 40px;
     width: 200px;

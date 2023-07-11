@@ -7,34 +7,29 @@ import { Starship } from "types/types";
 
 import { VehicleCard } from "components/Vehicle/Vehicle.styled";
 
-const Vehicle = (id) => {
+const Vehicle = (name) => {
   const [vehicles] = useRecoilState<Starship[]>(starshipsState);
-
-  if (vehicles.find((starship, key) => key == id.id)) {
-    const vehicle = vehicles[id.id];
+  if (vehicles.find((starship, key) => starship.name == name.name)) {
+    const vehicle = vehicles.find(
+      (starship, key) => starship.name == name.name,
+    );
     return (
       <VehicleCard>
-        <p>{vehicle.name}</p>
-        <p>{vehicle.model}</p>
-        <p>{vehicle.passengers}</p>
-        <p>{vehicle.starship_class}</p>
-        <p>{vehicle.MGLT}</p>
-        <p>{vehicle.cargo_capacity}</p>
-        <p>{vehicle.consumables}</p>
-        <p>{vehicle.crew}</p>
-        <p>{vehicle.cost_in_credits}</p>
-        <p>{vehicle.hyperdrive_rating}</p>
-        <p>{vehicle.length}</p>
-        <p>{vehicle.manufacturer}</p>
-        <p>{vehicle.max_atmosphering_speed}</p>
-        <p>{vehicle.cargo_capacity}</p>
+        <p>Name: {vehicle.name}</p>
+        <p>Passengers: {vehicle.passengers}</p>
+        <p>Class: {vehicle.starship_class}</p>
+        <p>Capacity: {vehicle.cargo_capacity}</p>
+        <p>Crew: {vehicle.crew}</p>
+        <p>Cost: {vehicle.cost_in_credits}</p>
+        <p>Length: {vehicle.length}</p>
+        <p>Max speed: {vehicle.max_atmosphering_speed}</p>
       </VehicleCard>
     );
   } else {
     return (
       <>
         <ToastContainer />
-        {toast(`Vehicle with id ${id} doesn't exist!`)}
+        {toast(`Vehicle with id ${name} doesn't exist!`)}
       </>
     );
   }

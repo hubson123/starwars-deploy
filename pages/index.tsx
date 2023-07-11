@@ -16,7 +16,7 @@ export default function Home() {
           height={"25%"}
           width={"50%"}
         />
-        <Link href="./vehicleList">Przejdź do listy statków.</Link>
+        <Link href="./vehicleList">Go to Vehicle List Page!</Link>
       </main>
     </div>
   );

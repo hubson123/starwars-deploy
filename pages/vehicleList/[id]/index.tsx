@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 export default function VehiclePage() {
   const router = useRouter();
 
-  const id = Number(router.query.id);
+  const id = router.query.id;
 
-  return <Vehicle id={id} />;
+  return <Vehicle name={id} />;
 }

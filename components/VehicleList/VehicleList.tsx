@@ -93,7 +93,6 @@ const VehicleList = () => {
 
   const handlePageChange = (selectedItem: any) => {
     const helper = selectedItem.selected * 10;
-    console.log("Tablica: ", helper);
     setPageNavigation(helper);
   };
   useEffect(() => {
@@ -111,7 +110,15 @@ const VehicleList = () => {
     setSearchInput(e.target.value);
   };
   const handleSelectChange = (e) => {
-    setSelectInput(e.value);
+    if (e?.value) {
+      setSelectInput(e.value);
+    } else {
+      setSelectInput("");
+    }
+  };
+  const handleClick = () => {
+    setSelectInput("");
+    setSearchInput("");
   };
   return (
     <>
@@ -120,7 +127,7 @@ const VehicleList = () => {
       {loading ? (
         <>
           <h2>Waiting until all ships are ready for war....</h2>
-          <PulseLoader color="#36d7b7" />
+          <PulseLoader color="yellow" />
         </>
       ) : (
         <>
@@ -130,6 +137,7 @@ const VehicleList = () => {
               placeholder="Select a film..."
               options={options}
               onChange={handleSelectChange}
+              isClearable
             />
             <input
               type="search"
@@ -137,12 +145,19 @@ const VehicleList = () => {
               onChange={handleSearchChange}
               value={searchInput}
             />
+            <button onClick={handleClick}>Clear Filters</button>
           </FilterSection>
           <StyledWrapper>
             {vehicles
-              .filter((vehicle: Starship) => vehicle.name.match(searchInput))
               .filter((vehicle: Starship) =>
-                vehicle.films.includes(selectInput),
+                searchInput.length > 1
+                  ? vehicle.name.match(searchInput)
+                  : vehicle,
+              )
+              .filter((vehicle: Starship) =>
+                selectInput.length > 1
+                  ? vehicle.films.includes(selectInput)
+                  : vehicle,
               )
               .map(
                 (vehicle: Starship, key: number) =>
@@ -150,14 +165,13 @@ const VehicleList = () => {
                   key < pageNavigation + 10 && (
                     <StyledCard key={key}>
                       <p>{vehicle.name}</p>
-                      <Link href={`/vehicleList/${key}`}>Details</Link>
+                      <Link href={`/vehicleList/${vehicle.name}`}>Details</Link>
                     </StyledCard>
                   ),
               )}
 
             <ReactPaginate
               pageCount={pageCount}
-              marginPagesDisplayed={4}
               onPageChange={handlePageChange}
               containerClassName={"container"}
               previousLinkClassName={"page"}

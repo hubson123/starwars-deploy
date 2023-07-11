@@ -1,6 +1,9 @@
 .container {
   display: flex;
   list-style: none;
+  max-width: 20rem;
+  align-items: center;
+  justify-content: center;
 }
 a {
   text-decoration: none;
@@ -14,7 +17,7 @@ a {
   padding: 10px;
   border: 1px solid #dcdcdc;
   border-radius: 6px;
-  margin-right: 10px;
+  margin-right: 5px;
   cursor: pointer;
 }
 
@@ -28,9 +31,9 @@ a {
 }
 
 .previous {
-  padding: 10px;
+  padding: 5px;
   border-radius: 6px;
-  margin-right: 10px;
+  margin-right: 5px;
   cursor: pointer;
 }
 
@@ -39,9 +42,9 @@ a {
 }
 
 .next {
-  padding: 10px;
+  padding: 5px;
   border-radius: 6px;
-  margin-right: 10px;
+  margin-right: 5px;
   cursor: pointer;
 }
 main {
